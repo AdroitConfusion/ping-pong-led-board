@@ -10,24 +10,22 @@ int lastDirection;
 bool snakeGameOver;
 int snakeColor;
 
-bool newGame = true;
-
-unsigned long last_delay;
-unsigned long game_delay;
+unsigned long snake_last_delay;
+unsigned long snake_game_delay;
 
 
-void snake(const int& joy_x, const int& joy_y, const bool& butt_z, const bool& butt_c) {  
-    if (newGame)
-        initSnake(newGame);
+void snake(const int& joy_x, const int& joy_y, const bool& butt_z, const bool& butt_c, bool& new_game) {  
+    if (new_game)
+        initSnake(new_game);
     
-    checkSnakeDirection(joy_x, joy_y);
+    checkController(joy_x, joy_y);
         
-    if (millis() - last_delay >= game_delay) {
+    if (millis() - snake_last_delay >= snake_game_delay) {
         if (!snakeGameOver) {   
             if (butt_c)
                 snakeGameOver = true;
 
-            last_delay = millis();
+            snake_last_delay = millis();
 
 
             moveSnake();
@@ -44,15 +42,17 @@ void snake(const int& joy_x, const int& joy_y, const bool& butt_z, const bool& b
             leds[convertXY(snakeX[0], snakeY[0])] = CRGB(255,255,255);
 
         } else {
-            newGame = true;
+            new_game = true;
             idle = millis();
         }
     }
 }
 
 // Define variables for new game of snake
-void initSnake(bool& newGame) {
-    FastLED.clear(false);
+void initSnake(bool& new_game) {
+    FastLED.clear(true);
+
+    srand(millis());
 
     snakeX[0] = 14;
     snakeY[0] = 14;
@@ -66,14 +66,14 @@ void initSnake(bool& newGame) {
     appleX = 0;
     appleY = 14;
 
-    game_delay = 300;
-    last_delay = millis();
+    snake_game_delay = 300;
+    snake_last_delay = millis();
     
-    newGame = false;
+    new_game = false;
 }
 
 // Determine direction of snake head based on nunchuk joystick
-void checkSnakeDirection(const int& joy_x, const int& joy_y) {
+void checkController(const int& joy_x, const int& joy_y) {
     if (joy_x < 50 && lastDirection != 0)
         snakeDirection = 180;
     else if (joy_x  > 200 && lastDirection != 180)
@@ -149,27 +149,27 @@ void checkSnake() {
 //Change snake color and speed as the game goes on
 void changeDelayAndColor() {
     if (snakeLength < 8) {
-        game_delay = 300;
+        snake_game_delay = 300;
         snakeColor = 100;
     }
     else if (snakeLength < 11) {
-        game_delay = 200;
+        snake_game_delay = 200;
         snakeColor = 120;
     }
     else if (snakeLength < 14) {
-        game_delay = 150;
+        snake_game_delay = 150;
         snakeColor = 140;
     }
     else if (snakeLength < 17) {
-        game_delay = 100;
+        snake_game_delay = 100;
         snakeColor = 160;
     }
     else if (snakeLength < 20) {
-        game_delay = 50;
+        snake_game_delay = 50;
         snakeColor = 180;
     }
     else {
-        game_delay = 25;
+        snake_game_delay = 25;
         snakeColor += 20;
     }
 }

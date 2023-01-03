@@ -1,4 +1,5 @@
-#pragma once
+#ifndef LETTERS_H
+#define LETTERS_H
 
 //all coordinate arrays of letters and other stuff
 
@@ -49,3 +50,5 @@ extern int exclamationPoint[][2];
 extern int questionMark[][2];
 extern int hashtag[][2];
 extern int underscore[][2];
+
+#endif

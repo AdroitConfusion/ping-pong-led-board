@@ -1,4 +1,5 @@
-#pragma once
+#ifndef DRAW_H
+#define DRAW_H
 
 #include <FastLED.h>
 #include <NintendoExtensionCtrl.h>
@@ -23,3 +24,4 @@ void drawArray(const int arr[][2], int x, int y, int arrSize, int color);
 
 void snakeScreen();
 
+#endif

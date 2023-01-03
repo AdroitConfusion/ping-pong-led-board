@@ -31,9 +31,9 @@ void drawArray(const int arr[][2], int x, int y, int arrSize, int color) {
 
 void snakeScreen() {
   fill(100);
-  drawArray(S,0,11,20,-1);
-  drawArray(N,6,11,20,-1);
-  drawArray(A,12,11,20,-1);
-  drawArray(K,18,11,20,-1);
-  drawArray(E,24,11,20,-1);
+  drawArray(S, 0, 11, 20, -1);
+  drawArray(N, 6, 11, 20, -1);
+  drawArray(A, 12, 11, 20, -1);
+  drawArray(K, 18, 11, 20, -1);
+  drawArray(E, 24, 11, 20, -1);
 }
