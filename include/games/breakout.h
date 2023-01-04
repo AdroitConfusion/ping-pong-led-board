@@ -1,5 +1,6 @@
 #include "draw.h"
 
+namespace Breakout {
 struct BreakoutBlock {
     int block_x[6];
     int block_y[6];
@@ -29,21 +30,22 @@ struct BreakoutBlock {
     }
 };
 
-void breakout(const int &joy_x, const int &joy_y, const bool &butt_z, const bool &butt_c, bool &new_game);
-void initBreakout(bool &new_game);
+void breakout();
+void initBreakout();
 
-void breakoutCheckController(const int &joy_x, const int &joy_y);
-void movePaddle(const int &joy_x);
+void breakoutCheckController();
+void movePaddle();
 void moveBreakoutBall();
 
 void drawPaddle();
 void drawBreakoutWalls();
 
 void resetBreakoutBall();
-void checkBreakoutBall(const int &joy_x);
+void checkBreakoutBall();
 
 void saveBreakoutBlocks();
 void loadBreakoutBlocks();
-int checkBreakoutBlock(const int &bX, const int &bY);
+int checkBreakoutBlock(const int &offset_x, const int &offset_y);
 bool numberOfBreakoutBlocksDestroyed();
 void changeScoreAndBlockColor(const int &check);
+} // namespace Breakout

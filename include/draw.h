@@ -8,15 +8,20 @@
 
 #define WIDTH 30
 #define HEIGHT 30
-#define NUM_LEDS WIDTH * HEIGHT
+#define NUM_LEDS WIDTH *HEIGHT
 
 extern CRGB leds_plus_safety_pixel[NUM_LEDS + 1];
-extern CRGB* const leds;
+extern CRGB *const leds;
 
 extern Nunchuk nchuk;
 
 extern int idle;
+extern bool new_game;
 
+extern int joy_y;
+extern int joy_x;
+extern bool butt_z;
+extern bool butt_c;
 
 int convertXY(int x, int y);
 void fill(int color);

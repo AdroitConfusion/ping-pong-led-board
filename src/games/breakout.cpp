@@ -1,13 +1,12 @@
 #include "..\include\games\breakout.h"
 
-#define TOTAL_NUM_BLOCKS 27
-
+namespace Breakout {
+const int TOTAL_NUM_BLOCKS = 27;
 const int GAME_OVER_Y = 24;
-const int BREAKOUT_WIDTH_RIGHT = 28;
-const int BREAKOUT_WIDTH_LEFT = 1;
+const int WIDTH_RIGHT = 28;
+const int WIDTH_LEFT = 1;
 
-int breakout_score;
-int breakout_frame;
+int score;
 
 BreakoutBlock block_arr[TOTAL_NUM_BLOCKS];
 
@@ -26,32 +25,30 @@ int prev_ball_y_one;
 int prev_ball_x_two;
 int prev_ball_y_two;
 
-unsigned long breakout_last_delay;
-unsigned long breakout_game_delay;
+unsigned long frame;
+unsigned long last_delay;
+unsigned long game_delay;
 
-void breakout(const int &joy_x, const int &joy_y, const bool &butt_idx, const bool &butt_c, bool &new_game) {
+void breakout() {
 
     if (new_game)
-        initBreakout(new_game);
+        initBreakout();
 
-    breakoutCheckController(joy_x, joy_y);
+    breakoutCheckController();
 
-    while (millis() - breakout_last_delay >= breakout_game_delay) {
+    while (millis() - last_delay >= game_delay) {
         if (!new_game) {
             if (ball_y == GAME_OVER_Y || butt_c)
                 new_game = true;
 
-            breakout_last_delay = millis();
+            last_delay = millis();
 
-            movePaddle(joy_x);
-            
+            movePaddle();
 
             // must be even and positive
             int breakout_frame_rate = 2;
-            int breakout_frame_mod = breakout_frame % breakout_frame_rate;
+            int breakout_frame_mod = frame % breakout_frame_rate;
             int fade = breakout_frame_mod * 255 / breakout_frame_rate;
-
-            // if (breakout_frame % 2 == 0)
 
             // Set previous ball positions, check area around ball, change direction if need be, and move ball
             if (breakout_frame_mod == 0) {
@@ -60,7 +57,7 @@ void breakout(const int &joy_x, const int &joy_y, const bool &butt_idx, const bo
                 prev_ball_x_two = prev_ball_x_one - ball_dx;
                 prev_ball_y_two = prev_ball_y_one + ball_dy;
 
-                checkBreakoutBall(joy_x);
+                checkBreakoutBall();
                 moveBreakoutBall();
             }
 
@@ -76,24 +73,24 @@ void breakout(const int &joy_x, const int &joy_y, const bool &butt_idx, const bo
 
             loadBreakoutBlocks();
             if (numberOfBreakoutBlocksDestroyed())
-                breakout_score += 5;
+                score += 5;
 
             FastLED.show();
 
-            breakout_frame++;
+            frame++;
         } else {
             idle = millis();
         }
     }
 }
 
-void initBreakout(bool &new_game) {
+void initBreakout() {
     FastLED.clear(true);
 
     srand(millis());
 
-    breakout_score = 0;
-    breakout_frame = 0;
+    score = 0;
+    frame = 0;
     for (int i = 0; i < 4; i++)
         padd_x[i] = i + 7;
     padd_y = 20;
@@ -102,25 +99,25 @@ void initBreakout(bool &new_game) {
     saveBreakoutBlocks();
     resetBreakoutBall();
 
-    breakout_last_delay = millis();
-    breakout_game_delay = 100;
+    last_delay = millis();
+    game_delay = 100;
 
     new_game = false;
 }
 
-void breakoutCheckController(const int &joy_x, const int &joy_y) {
+void breakoutCheckController() {
     if (joy_x < 50)
         padd_dir = -1;
     else if (joy_x > 200)
         padd_dir = 1;
 }
 
-void movePaddle(const int &joy_x) {
-    if (padd_dir == -1 && padd_x[0] > BREAKOUT_WIDTH_LEFT)
+void movePaddle() {
+    if (padd_dir == -1 && padd_x[0] > WIDTH_LEFT)
         for (int i = 0; i < 4; i++)
             padd_x[i] -= 1;
 
-    if (padd_dir == 1 && padd_x[3] < BREAKOUT_WIDTH_RIGHT)
+    if (padd_dir == 1 && padd_x[3] < WIDTH_RIGHT)
         for (int i = 0; i < 4; i++)
             padd_x[i] += 1;
     padd_dir = 0;
@@ -162,7 +159,7 @@ void moveBreakoutBall() {
     ball_y -= ball_dy;
 }
 
-void checkBreakoutBall(const int &joy_x) {
+void checkBreakoutBall() {
     // Checks up, down, left, and right to see if ball is hitting block
     int checkUp = checkBreakoutBlock(0, -1);
     int checkDown = checkBreakoutBlock(0, 1);
@@ -203,7 +200,7 @@ void checkBreakoutBall(const int &joy_x) {
             ball_dx = -1;
     }
     // Detect if ball hitting walls and change direction if so
-    if (ball_x > BREAKOUT_WIDTH_RIGHT || ball_x < BREAKOUT_WIDTH_LEFT)
+    if (ball_x > WIDTH_RIGHT || ball_x < WIDTH_LEFT)
         ball_dx *= -1;
     if (ball_y >= 29 || ball_y <= 1)
         ball_dy *= -1;
@@ -277,10 +274,10 @@ void loadBreakoutBlocks() {
     }
 }
 
-int checkBreakoutBlock(const int &bX, const int &bY) {
+int checkBreakoutBlock(const int &offset_x, const int &offset_Y) {
     for (int idx = 0; idx < TOTAL_NUM_BLOCKS; idx++) {
         for (int i = 0; i < 6; i++) {
-            if (block_arr[idx].color != -1 && block_arr[idx].block_x[i] == ball_x + bX && block_arr[idx].block_y[i] == ball_y + bY) {
+            if (block_arr[idx].color != -1 && block_arr[idx].block_x[i] == ball_x + offset_x && block_arr[idx].block_y[i] == ball_y + offset_Y) {
                 return idx;
             }
         }
@@ -304,7 +301,7 @@ bool numberOfBreakoutBlocksDestroyed() {
 }
 
 void changeScoreAndBlockColor(const int &check) {
-    breakout_score += 1;
+    score += 1;
     switch (block_arr[check].color) {
     case 50:
         block_arr[check].color = -1;
@@ -319,3 +316,4 @@ void changeScoreAndBlockColor(const int &check) {
         break;
     }
 }
+} // namespace Breakout

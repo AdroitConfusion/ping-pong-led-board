@@ -1,30 +1,30 @@
 #include "..\include\games\snake.h"
 
-int snakeX[NUM_LEDS];
-int snakeY[NUM_LEDS];
-int snakeLength;
-int appleX;
-int appleY;
-int snakeDirection; // snake direction has integer values of degrees in circle
-int lastDirection;
-bool snakeGameOver;
-int snakeColor;
+namespace Snake {
+int snake_x[NUM_LEDS];
+int snake_y[NUM_LEDS];
+int snake_len;
+int apple_x;
+int apple_y;
+int snake_dir; // snake direction has integer values of degrees in circle
+int last_dir;
+int snake_color;
 
-unsigned long snake_last_delay;
-unsigned long snake_game_delay;
+unsigned long last_delay;
+unsigned long game_delay;
 
-void snake(const int &joy_x, const int &joy_y, const bool &butt_z, const bool &butt_c, bool &new_game) {
+void snake() {
     if (new_game)
-        initSnake(new_game);
+        initSnake();
 
-    snakeCheckController(joy_x, joy_y);
+    checkController();
 
-    if (millis() - snake_last_delay >= snake_game_delay) {
+    if (millis() - last_delay >= game_delay) {
         if (!new_game) {
             if (butt_c)
                 new_game = true;
 
-            snake_last_delay = millis();
+            last_delay = millis();
 
             moveSnake();
             checkSnake();
@@ -32,12 +32,12 @@ void snake(const int &joy_x, const int &joy_y, const bool &butt_z, const bool &b
 
             FastLED.clear(false);
             // Draw apple
-            leds[convertXY(appleX, appleY)] = CHSV(255, 255, 255);
+            leds[convertXY(apple_x, apple_y)] = CHSV(255, 255, 255);
             // Draw snake
-            for (int i = 1; i < snakeLength; i++)
-                leds[convertXY(snakeX[i], snakeY[i])] = CHSV(snakeColor, 255, 255);
+            for (int i = 1; i < snake_len; i++)
+                leds[convertXY(snake_x[i], snake_y[i])] = CHSV(snake_color, 255, 255);
             // Color snake head
-            leds[convertXY(snakeX[0], snakeY[0])] = CRGB(255, 255, 255);
+            leds[convertXY(snake_x[0], snake_y[0])] = CRGB(255, 255, 255);
 
         } else {
             idle = millis();
@@ -46,122 +46,124 @@ void snake(const int &joy_x, const int &joy_y, const bool &butt_z, const bool &b
 }
 
 // Define variables for new game of snake
-void initSnake(bool &new_game) {
+void initSnake() {
     FastLED.clear(true);
 
     srand(millis());
 
-    snakeX[0] = 14;
-    snakeY[0] = 14;
-    snakeLength = 5;
+    memset(&snake_x, -1, sizeof(snake_x[0]) * NUM_LEDS);
+    memset(&snake_y, -1, sizeof(snake_y[0]) * NUM_LEDS);
 
-    snakeDirection = 0;
-    lastDirection = 0;
-    snakeGameOver = false;
-    snakeColor = 100;
+    snake_x[0] = 14;
+    snake_y[0] = 14;
+    snake_len = 5;
 
-    appleX = 0;
-    appleY = 14;
+    snake_dir = 0;
+    last_dir = 0;
+    snake_color = 100;
 
-    snake_game_delay = 300;
-    snake_last_delay = millis();
+    apple_x = 0;
+    apple_y = 14;
+
+    game_delay = 300;
+    last_delay = millis();
 
     new_game = false;
 }
 
 // Determine direction of snake head based on nunchuk joystick
-void snakeCheckController(const int &joy_x, const int &joy_y) {
-    if (joy_x < 50 && lastDirection != 0)
-        snakeDirection = 180;
-    else if (joy_x > 200 && lastDirection != 180)
-        snakeDirection = 0;
-    else if (joy_y > 200 && lastDirection != 90)
-        snakeDirection = 270;
-    else if (joy_y < 50 && lastDirection != 270)
-        snakeDirection = 90;
+void checkController() {
+    if (joy_x < 50 && last_dir != 0)
+        snake_dir = 180;
+    else if (joy_x > 200 && last_dir != 180)
+        snake_dir = 0;
+    else if (joy_y > 200 && last_dir != 90)
+        snake_dir = 270;
+    else if (joy_y < 50 && last_dir != 270)
+        snake_dir = 90;
 }
 
 void moveSnake() {
     // Assign new snake segments
-    for (int i = snakeLength - 1; i > 0; i--) {
-        snakeX[i] = snakeX[i - 1];
-        snakeY[i] = snakeY[i - 1];
+    for (int i = snake_len - 1; i > 0; i--) {
+        snake_x[i] = snake_x[i - 1];
+        snake_y[i] = snake_y[i - 1];
     }
 
     // Move snake head in the given direction
-    switch (snakeDirection) {
+    switch (snake_dir) {
     case 180:
-        snakeX[0]--;
+        snake_x[0]--;
         break;
     case 0:
-        snakeX[0]++;
+        snake_x[0]++;
         break;
     case 90:
-        snakeY[0]++;
+        snake_y[0]++;
         break;
     case 270:
-        snakeY[0]--;
+        snake_y[0]--;
         break;
     default:
         break;
     }
-    lastDirection = snakeDirection;
+    last_dir = snake_dir;
 
     // If touching a wall, teleport to opposite wall
-    if (snakeX[0] < 0)
-        snakeX[0] = WIDTH - 1;
-    else if (snakeX[0] > WIDTH - 1)
-        snakeX[0] = 0;
+    if (snake_x[0] < 0)
+        snake_x[0] = WIDTH - 1;
+    else if (snake_x[0] > WIDTH - 1)
+        snake_x[0] = 0;
 
-    if (snakeY[0] < 0)
-        snakeY[0] = HEIGHT - 1;
-    else if (snakeY[0] > HEIGHT - 1)
-        snakeY[0] = 0;
+    if (snake_y[0] < 0)
+        snake_y[0] = HEIGHT - 1;
+    else if (snake_y[0] > HEIGHT - 1)
+        snake_y[0] = 0;
 }
 
 void checkSnake() {
     // Determine if snake head has eaten the apple
-    if (snakeX[0] == appleX && snakeY[0] == appleY) {
-        snakeLength++;
-        boolean appleRespawn = true;
-        while (appleRespawn) {
-            appleX = rand() % WIDTH;
-            appleY = rand() % HEIGHT;
-            //      Serial.printf("%d, %d\n", appleX, appleY);
-            appleRespawn = false;
-            for (int i = 0; i < snakeLength; i++) {
-                if (snakeX[i] == appleX && snakeY[i] == appleY)
-                    appleRespawn = true;
+    if (snake_x[0] == apple_x && snake_y[0] == apple_y) {
+        snake_len++;
+        bool apple_respawned = false;
+        while (!apple_respawned) {
+            apple_x = rand() % WIDTH;
+            apple_y = rand() % HEIGHT;
+            apple_respawned = true;
+            for (int i = 0; i < snake_len; i++) {
+                if (snake_x[i] == apple_x && snake_y[i] == apple_y)
+                    apple_respawned = false;
             }
         }
     }
 
     // Detect if the snake head is biting itself
-    for (int i = 1; i < snakeLength; i++) {
-        if (snakeX[i] == snakeX[0] && snakeY[i] == snakeY[0])
-            snakeGameOver = true;
+    for (int i = 1; i < snake_len; i++) {
+        if (snake_x[i] == snake_x[0] && snake_y[i] == snake_y[0])
+            new_game = true;
     }
 }
 
 // Change snake color and speed as the game goes on
 void changeDelayAndColor() {
-    if (snakeLength < 8) {
-        snake_game_delay = 300;
-        snakeColor = 100;
-    } else if (snakeLength < 11) {
-        snake_game_delay = 200;
-        snakeColor = 120;
-    } else if (snakeLength < 14) {
-        snake_game_delay = 150;
-        snakeColor = 140;
-    } else if (snakeLength < 17) {
-        snake_game_delay = 100;
-        snakeColor = 160;
-    } else if (snakeLength < 20) {
-        snake_game_delay = 50;
-        snakeColor = 180;
+    if (snake_len < 8) {
+        game_delay = 300;
+        snake_color = 100;
+    } else if (snake_len < 11) {
+        game_delay = 200;
+        snake_color = 120;
+    } else if (snake_len < 14) {
+        game_delay = 150;
+        snake_color = 140;
+    } else if (snake_len < 17) {
+        game_delay = 100;
+        snake_color = 160;
+    } else if (snake_len < 20) {
+        game_delay = 50;
+        snake_color = 180;
     } else {
-        snake_game_delay = 25;
-        snakeColor += 20;
+        game_delay = 25;
+        snake_color += 20;
     }
+}
 }

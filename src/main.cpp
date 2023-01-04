@@ -20,8 +20,6 @@ const int BRIGHTNESS = 80;
 
 int screen_num = 900;
 
-bool new_game = true;
-
 void setup() {
     FastLED.addLeds<CHIPSET, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalSMD5050);
     FastLED.setBrightness(BRIGHTNESS);
@@ -37,17 +35,16 @@ void setup() {
 }
 
 void loop() {
-
     bool success = nchuk.update(); // Get new data from the nunchuk
     if (!success) {
         Serial.println(F("Controller disconnected!"));
         delay(1000);
     } else {
         // Nunchuk inputs
-        int joy_y = nchuk.joyY();
-        int joy_x = nchuk.joyX();
-        bool butt_z = nchuk.buttonZ();
-        bool butt_c = nchuk.buttonC();
+        joy_y = nchuk.joyY();
+        joy_x = nchuk.joyX();
+        butt_z = nchuk.buttonZ();
+        butt_c = nchuk.buttonC();
 
         int curr_screen = screen_num % 10;
 
@@ -60,15 +57,16 @@ void loop() {
             idle = millis();
         }
 
-        ConnectFour::connectFour(joy_x, joy_y, butt_z, butt_c);
+        ConnectFour::connectFour();
+        // Snake::snake();
 
         // if (butt_z || new_game == false) {
         //   switch (curr_screen) {
         //     case 0:
-        //       snake(joy_x, joy_y, butt_z, butt_c, new_game);
+        //       snake(, butt_z, butt_c, new_game);
         //       break;
         //     case 1:
-        //       tetris(joy_x, joy_y, butt_z, butt_c, new_game);
+        //       tetris(, butt_z, butt_c, new_game);
         //       break;
         //     default:
         //       break;
