@@ -5,6 +5,9 @@
 //Header files
 #include "..\include\games\snake.h"
 #include "..\include\games\tetris.h"
+#include "..\include\games\breakout.h"
+#include "..\include\games\bird.h"
+
 
 // Macros
 #define LED_PIN D4
@@ -57,7 +60,7 @@ void loop() {
       idle = millis();
     }
 
-    tetris(joy_x, joy_y, butt_z, butt_c, new_game);
+    Bird::bird(joy_x, joy_y, butt_z, butt_c, new_game);
     
     // if (butt_z || new_game == false) {
     //   switch (curr_screen) {
