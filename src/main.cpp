@@ -7,6 +7,7 @@
 #include "..\include\games\breakout.h"
 #include "..\include\games\connect_four.h"
 #include "..\include\games\snake.h"
+#include "..\include\games\space_invaders.h"
 #include "..\include\games\tetris.h"
 
 // Macros
@@ -35,6 +36,7 @@ void setup() {
 }
 
 void loop() {
+    
     bool success = nchuk.update(); // Get new data from the nunchuk
     if (!success) {
         Serial.println(F("Controller disconnected!"));
@@ -57,7 +59,9 @@ void loop() {
             idle = millis();
         }
 
-        ConnectFour::connectFour();
+        // ConnectFour::connectFour();
+        SpaceInvaders::spaceInvaders();
+
         // Snake::snake();
 
         // if (butt_z || new_game == false) {
