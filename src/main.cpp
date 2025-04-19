@@ -16,8 +16,13 @@
 #define CHIPSET WS2811
 
 // Constants
-const int BAUD_RATE = 115200;
-const int BRIGHTNESS = 80;
+constexpr int BAUD_RATE = 115200;
+constexpr int BRIGHTNESS = 80;
+
+constexpr int NUM_GAMES = 1;
+enum GAMES {
+    SNAKE = 0
+};
 
 int screen_num = 900;
 
@@ -36,7 +41,7 @@ void setup() {
 }
 
 void loop() {
-    
+
     bool success = nchuk.update(); // Get new data from the nunchuk
     if (!success) {
         Serial.println(F("Controller disconnected!"));
@@ -48,36 +53,47 @@ void loop() {
         butt_z = nchuk.buttonZ();
         butt_c = nchuk.buttonC();
 
-        int curr_screen = screen_num % 10;
+        int screen_num = screen_num % 10;
 
         // Switch screen and reset idle timer based on joystick movement in x direction
         if (joy_x > 240 && millis() % 200 == 0 && new_game) {
-            screen_num++;
+            screen_num = (++screen_num) % NUM_GAMES;
             idle = millis();
         } else if (joy_x < 10 && millis() % 200 == 0 && new_game) {
-            screen_num--;
+            screen_num = (--screen_num) % NUM_GAMES;
             idle = millis();
         }
 
-        // ConnectFour::connectFour();
-        SpaceInvaders::spaceInvaders();
+        // Show screen
+        switch (screen_num) {
+        case GAMES::SNAKE:
+            showSnakeScreen();
+            break;
+        default:
+            showSnakeScreen();
+            break;
+        }
 
-        // Snake::snake();
+        // Select game
+        if (butt_z) {
+            switch (screen_num) {
+            case GAMES::SNAKE:
+                Snake::snake();
+                break;
+            default:
+                break;
+            }
+        }
 
-        // if (butt_z || new_game == false) {
-        //   switch (curr_screen) {
-        //     case 0:
-        //       snake(, butt_z, butt_c, new_game);
-        //       break;
-        //     case 1:
-        //       tetris(, butt_z, butt_c, new_game);
-        //       break;
-        //     default:
-        //       break;
-        //   }
-        // }
-
-        // snakeScreen();
         FastLED.show();
     }
+}
+
+void showSnakeScreen() {
+    fill(100);
+    drawArray(S, 0, 11, 20, -1);
+    drawArray(N, 6, 11, 20, -1);
+    drawArray(A, 12, 11, 20, -1);
+    drawArray(K, 18, 11, 20, -1);
+    drawArray(E, 24, 11, 20, -1);
 }

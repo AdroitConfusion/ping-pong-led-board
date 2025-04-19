@@ -2,6 +2,7 @@
 #include "unordered_set"
 
 namespace SpaceInvaders {
+    
 const int GAME_WIDTH_LEFT = 0;
 const int GAME_WIDTH_RIGHT = 29;
 
@@ -76,7 +77,8 @@ struct Turret {
     int &min_x = x_arr[1];
     int &bullet_start_x = x_arr[0];
     int &bullet_start_y = y_arr[3];
-    int turret_dir;
+    int dir;
+    bool shoot;
 
     std::vector<Bullet> bullet_vec;
 
@@ -99,24 +101,27 @@ struct Turret {
 
         bullet_vec.clear();
 
-        turret_dir = 0;
+        dir = 0;
+        shoot = false;
     }
 
     void moveTurret() {
-        if (turret_dir == -1 && min_x > GAME_WIDTH_LEFT) {
+        if (dir == -1 && min_x > GAME_WIDTH_LEFT) {
             for (int &x : x_arr)
                 x--;
         }
 
-        if (turret_dir == 1 && max_x < GAME_WIDTH_RIGHT) {
+        if (dir == 1 && max_x < GAME_WIDTH_RIGHT) {
             for (int &x : x_arr)
                 x++;
         }
-        turret_dir = 0;
+        dir = 0;
     }
 
     void addBullet() {
-        bullet_vec.push_back(Bullet(bullet_start_x, bullet_start_y, CHSV(160, 150, 255), -1));
+        if (shoot == true)
+            bullet_vec.push_back(Bullet(bullet_start_x, bullet_start_y, CHSV(160, 150, 255), -1));
+        shoot = false;
     }
 
     void moveBullets() {

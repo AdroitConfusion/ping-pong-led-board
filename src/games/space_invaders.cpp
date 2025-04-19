@@ -8,7 +8,7 @@ int spaceShipX[6];
 int spaceShipColor;
 int spaceShipDot;
 
-bool ShipCollision;
+bool shipCollision;
 
 int numRounds;
 
@@ -48,7 +48,7 @@ void spaceInvaders() {
             last_delay = millis();
 
             turret.moveTurret();
-            if (butt_z && frame_count % 10 == 0)
+            if (frame_count % 10 == 0)
                 turret.addBullet();
             turret.moveBullets();
 
@@ -108,9 +108,12 @@ void initSpaceInvaders() {
 
 void checkController() {
     if (joy_x < 110)
-        turret.turret_dir = -1;
+        turret.dir = -1;
     else if (joy_x > 135)
-        turret.turret_dir = 1;
+        turret.dir = 1;
+
+    if (butt_z)
+        turret.shoot = true;
 }
 
 void drawTurret() {

@@ -34,12 +34,3 @@ void drawArray(const int arr[][2], int x, int y, int arrSize, int color) {
             leds[convertXY(arr[i][0] + x, arr[i][1] + y)] = CHSV(color, saturation, 255);
     }
 }
-
-void snakeScreen() {
-    fill(100);
-    drawArray(S, 0, 11, 20, -1);
-    drawArray(N, 6, 11, 20, -1);
-    drawArray(A, 12, 11, 20, -1);
-    drawArray(K, 18, 11, 20, -1);
-    drawArray(E, 24, 11, 20, -1);
-}
