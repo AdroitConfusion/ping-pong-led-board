@@ -30,19 +30,19 @@ private:
     };
 
     // Game state
-    int snake_x[NUM_LEDS];
-    int snake_y[NUM_LEDS];
-    int snake_len;
-    int apple_x;
-    int apple_y;
+    short int snake_x[NUM_LEDS];
+    short int snake_y[NUM_LEDS];
+    uint8_t snake_len;
+    uint8_t apple_x;
+    uint8_t apple_y;
     int snake_dir;
-    int last_dir;
-    int snake_color;
-    int snake_level;
+    uint8_t last_dir;
+    short int snake_color;
+    uint8_t snake_level;
     bool is_snake_rainbow;
 
     bool grid[WIDTH][HEIGHT];
-    std::pair<int, int> free_positions[WIDTH * HEIGHT];
+    std::pair<uint8_t, uint8_t> free_positions[WIDTH * HEIGHT];
 
     unsigned long last_delay;
     unsigned long game_delay;

@@ -14,11 +14,11 @@ void fill(const int &hue, const int &satur, const int &value) {
         leds[i] = CHSV(hue, satur, value);
 }
 
-void drawArray(const int arr[][2], int x, int y, int arrSize, int color) {
+void drawArray(const int arr[][2], const int &x, const int &y, const int &arrSize, const int &color) {
     int saturation = 255;
     if (color == -1)
         saturation = 0;
-    for (int i = 0; i < arrSize; i++) {
+    for (int i = 0; i < arrSize; ++i) {
         if (arr[i][0] + x > -1 && arr[i][0] + x < WIDTH && arr[i][1] + y > -1 && arr[i][1] + y < HEIGHT)
             leds[convertXY(arr[i][0] + x, arr[i][1] + y)] = CHSV(color, saturation, 255);
     }

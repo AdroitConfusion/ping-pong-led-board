@@ -15,6 +15,6 @@ extern CRGB *const leds;
 
 int convertXY(const int &x, const int &y);
 void fill(const int &hue, const int &satur = 255, const int &value = 100);
-void drawArray(const int arr[][2], int x, int y, int arrSize, int color);
+void drawArray(const int arr[][2], const int &x, const int &y, const int &arrSize, const int &color);
 
 #endif
