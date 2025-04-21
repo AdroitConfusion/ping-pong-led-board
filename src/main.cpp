@@ -1,8 +1,10 @@
 // main.cpp
-#include "../include/draw.h"
+#include "../include/util/controller_input.h"
+#include "../include/util/draw.h"
+
+#include "../include/games/breakout.h"
 #include "../include/games/snake.h"
 // #include "../include/games/bird.h"
-// #include "../include/games/breakout.h"
 // #include "../include/games/space_invaders.h"
 // #include "../include/games/tetris.h"
 #include <Arduino.h>
@@ -13,19 +15,25 @@
 
 constexpr int BAUD_RATE = 115200;
 constexpr int BRIGHTNESS = 80;
+constexpr int JOY_X_HIGH = 200;
+constexpr int JOY_X_LOW = 50;
+constexpr unsigned long SCREEN_UPDATE_DELAY = 200;
 
 Nunchuk nchuk;
 int idle;
 bool on_main_menu = true;
+unsigned long last_delay = millis();
 
 enum GameType {
     NONE = -1,
     SNAKE,
+    BREAKOUT,
     NUM_GAMES
 };
 
 GameType current_game = NONE;
 SnakeGame *snakeGame = nullptr;
+Breakout::BreakoutGame *breakoutGame = nullptr;
 
 void setup() {
     FastLED.addLeds<CHIPSET, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalSMD5050);
@@ -44,6 +52,7 @@ void handleGameLoop(const ControllerInput &input);
 void launchGame(GameType game);
 void cleanupGame(GameType game);
 void showSnakeScreen();
+void showBreakoutScreen();
 void showErrorScreen();
 
 void loop() {
@@ -68,19 +77,26 @@ void loop() {
 void handleMainMenu(const ControllerInput &input) {
     static int menu_index = 0;
 
-    if (input.joy_x > 240 && millis() % 200 == 0) {
+    if (input.joy_x > JOY_X_HIGH && millis() - last_delay >= SCREEN_UPDATE_DELAY) {
+        Serial.println(F("RIGHT"));
         menu_index = (menu_index + 1) % NUM_GAMES;
-        idle = millis();
-    } else if (input.joy_x < 10 && millis() % 200 == 0) {
+        last_delay = millis();
+    } else if (input.joy_x < JOY_X_LOW && millis() - last_delay >= SCREEN_UPDATE_DELAY) {
+        Serial.println(F("LEFT"));
         menu_index = (menu_index - 1 + NUM_GAMES) % NUM_GAMES;
-        idle = millis();
+        last_delay = millis();
     }
+
+    Serial.printf("menu_index: %d\n", menu_index);
 
     current_game = static_cast<GameType>(menu_index);
 
     switch (current_game) {
     case SNAKE:
         showSnakeScreen();
+        break;
+    case BREAKOUT:
+        showBreakoutScreen();
         break;
     default:
         showErrorScreen();
@@ -100,6 +116,10 @@ void handleGameLoop(const ControllerInput &input) {
         if (snakeGame)
             snakeGame->update(input);
         break;
+    case BREAKOUT:
+        if (breakoutGame)
+            breakoutGame->update(input);
+        break;
     default:
         break;
     }
@@ -116,6 +136,9 @@ void launchGame(GameType game) {
     case SNAKE:
         snakeGame = new SnakeGame();
         break;
+    case BREAKOUT:
+        breakoutGame = new Breakout::BreakoutGame();
+        break;
     default:
         break;
     }
@@ -126,6 +149,10 @@ void cleanupGame(GameType game) {
     case SNAKE:
         delete snakeGame;
         snakeGame = nullptr;
+        break;
+    case BREAKOUT:
+        delete breakoutGame;
+        breakoutGame = nullptr;
         break;
     default:
         break;
@@ -141,7 +168,17 @@ void showSnakeScreen() {
     drawArray(E, 24, 11, 20, -1);
 }
 
+void showBreakoutScreen() {
+    fill(60, 255, 50);
+    drawArray(B, 0, 11, 20, -1);
+    drawArray(R, 6, 11, 20, -1);
+    drawArray(E, 12, 11, 20, -1);
+    drawArray(A, 18, 11, 20, -1);
+    drawArray(K, 24, 11, 20, -1);
+}
+
 void showErrorScreen() {
+    fill(0, 255, 50);
     drawArray(E, 0, 11, 20, -1);
     drawArray(R, 6, 11, 20, -1);
     drawArray(R, 12, 11, 20, -1);

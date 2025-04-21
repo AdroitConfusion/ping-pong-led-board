@@ -2,17 +2,10 @@
 #ifndef SNAKE_H
 #define SNAKE_H
 
-#include "draw.h"
+#include "..\include\util\controller_input.h"
+#include "..\include\util\draw.h"
 #include <array>
 #include <utility>
-
-// Struct for passing controller input cleanly
-struct ControllerInput {
-    int joy_x;
-    int joy_y;
-    bool butt_z;
-    bool butt_c;
-};
 
 class SnakeGame {
 public:

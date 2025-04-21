@@ -4,7 +4,7 @@
 #include <FastLED.h>
 #include <NintendoExtensionCtrl.h>
 
-#include "letters.h"
+#include "../include/util/letters.h"
 
 constexpr int WIDTH = 30;
 constexpr int HEIGHT = 30;

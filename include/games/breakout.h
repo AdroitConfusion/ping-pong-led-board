@@ -1,51 +1,78 @@
-#include "draw.h"
+#ifndef BREAKOUT_GAME_H
+#define BREAKOUT_GAME_H
+
+#include "..\include\util\controller_input.h"
+#include "..\include\util\draw.h"
 
 namespace Breakout {
+
+constexpr uint8_t TOTAL_NUM_BLOCKS = 27;
+constexpr uint8_t GAME_OVER_Y = 24;
+constexpr uint8_t WIDTH_RIGHT = 28;
+constexpr uint8_t WIDTH_LEFT = 1;
+constexpr uint8_t BLOCK_WIDTH = 3;
+constexpr uint8_t PADDLE_WIDTH = 4;
+
 struct BreakoutBlock {
-    int block_x[6];
-    int block_y[6];
-    int color;
+    uint8_t block_x[2 * BLOCK_WIDTH];
+    uint8_t block_y[2 * BLOCK_WIDTH];
+    int8_t color;
 
-    BreakoutBlock(){};
+    BreakoutBlock() = default;
 
-    BreakoutBlock(int init_x, int init_y, int color) {
+    BreakoutBlock(const uint8_t &init_x, const uint8_t &init_y, const int8_t &color) {
         setBlockXY(init_x, init_y, color);
     }
 
-    void setBlockXY(int init_x, int init_y, int color) {
+    void setBlockXY(const uint8_t &init_x, const uint8_t &init_y, const int8_t &color) {
         this->color = color;
-        block_x[0] = init_x;
-        block_x[1] = init_x + 1;
-        block_x[2] = init_x + 2;
-        block_x[3] = init_x;
-        block_x[4] = init_x + 1;
-        block_x[5] = init_x + 2;
-
-        block_y[0] = init_y;
-        block_y[1] = init_y;
-        block_y[2] = init_y;
-        block_y[3] = init_y + 1;
-        block_y[4] = init_y + 1;
-        block_y[5] = init_y + 1;
+        for (uint8_t i = 0; i < BLOCK_WIDTH; ++i) {
+            block_x[i] = init_x + i;
+            block_y[i] = init_y;
+            block_x[i + BLOCK_WIDTH] = init_x + i;
+            block_y[i + BLOCK_WIDTH] = init_y + 1;
+        }
     }
 };
 
-void breakout();
-void initBreakout();
+class BreakoutGame {
+public:
+    BreakoutGame();
+    void update(const ControllerInput &input);
 
-void breakoutCheckController();
-void movePaddle();
-void moveBreakoutBall();
+private:
+    void initGame();
+    void checkController(const ControllerInput &input);
+    void movePaddle();
+    void drawPaddle();
+    void drawWalls();
+    void resetBall();
+    void moveBall();
+    void checkBallCollision(const ControllerInput &input);
+    void saveBlocks();
+    void loadBlocks();
+    int checkBlock(int8_t offset_x, int8_t offset_y);
+    bool checkWinCondition();
+    void hitBlock(int blockIndex);
 
-void drawPaddle();
-void drawBreakoutWalls();
+    uint8_t score = 0;
+    bool new_game = true;
 
-void resetBreakoutBall();
-void checkBreakoutBall();
+    BreakoutBlock blocks[TOTAL_NUM_BLOCKS];
 
-void saveBreakoutBlocks();
-void loadBreakoutBlocks();
-int checkBreakoutBlock(const int &offset_x, const int &offset_y);
-bool numberOfBreakoutBlocksDestroyed();
-void changeScoreAndBlockColor(const int &check);
+    uint8_t ball_x, ball_y;
+    int8_t ball_dx, ball_dy;
+
+    uint8_t padd_x[PADDLE_WIDTH];
+    uint8_t padd_y;
+    int8_t padd_dir = 0;
+
+    uint8_t prev_x1, prev_y1, prev_x2, prev_y2;
+    uint32_t frame = 0;
+    uint32_t last_delay = 0;
+    uint32_t game_delay = 100;
+};
+
 } // namespace Breakout
+
+#endif // BREAKOUT_GAME_H
