@@ -3,26 +3,15 @@
 CRGB leds_plus_safety_pixel[NUM_LEDS + 1];
 CRGB *const leds(leds_plus_safety_pixel + 1);
 
-Nunchuk nchuk;
-
-int idle = millis();
-
-int joy_y = 0;
-int joy_x = 0;
-bool butt_z = false;
-bool butt_c = false;
-
-bool new_game = true;
-
-int convertXY(int x, int y) {
+int convertXY(const int &x, const int &y) {
     if (y >= HEIGHT || x >= WIDTH)
         return -1;
     return y % 2 == 0 ? (y * WIDTH) + x : ((y + 1) * WIDTH) - (x + 1);
 }
 
-void fill(int color) {
+void fill(const int &hue, const int &satur, const int &value) {
     for (int i = 0; i < NUM_LEDS; i++)
-        leds[i] = CHSV(color, 255, 120);
+        leds[i] = CHSV(hue, satur, value);
 }
 
 void drawArray(const int arr[][2], int x, int y, int arrSize, int color) {
